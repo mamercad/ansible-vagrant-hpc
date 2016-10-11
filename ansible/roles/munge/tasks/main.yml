@@ -1,0 +1,109 @@
+---
+
+- name: fetch munge archive
+  get_url:
+    url: "{{ munge.archive }}"
+    checksum: "sha512:{{ munge.checksum }}"
+    dest: "{{ munge.topdir }}"
+    owner: root
+    group: root
+
+- name: extract munge archive
+  unarchive:
+    src: "{{ munge.topdir }}/{{ munge.basename }}"
+    dest: "{{ munge.topdir }}"
+    copy: no
+    owner: root
+    group: root
+
+- name: install Development Tools
+  yum:
+    name: "@Development Tools"
+    state: present
+
+- name: configure munge
+  shell: ./configure
+  args:
+    chdir: "{{ munge.basedir }}"
+    creates: config.log
+
+- name: make munge
+  shell: make
+  args:
+    chdir: "{{ munge.basedir }}"
+    creates: src/munge/munge
+
+- name: make install munge
+  shell: make install
+  args:
+    chdir: "{{ munge.basedir }}"
+    creates: /usr/local/bin/munge
+
+- name: install libselinux-python
+  yum:
+    name: libselinux-python
+    state: present
+
+- name: copy munge init script
+  copy:
+    src: /usr/local/etc/rc.d/init.d/munge
+    dest: /etc/init.d/munge
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0755
+
+- name: chkconfig --add munge
+  shell: chkconfig --add munge
+  args:
+    creates: /etc/rc0.d/K33munge
+
+- name: create munge group
+  group:
+    name: munge
+    gid: "{{ munge.gid }}"
+    state: present
+
+- name: create munge user
+  user:
+    name: munge
+    uid: "{{ munge.uid }}"
+    group: munge
+    state: present
+
+- name: let munge own log directory
+  file:
+    path: /usr/local/var/log/munge
+    state: directory
+    owner: munge
+    group: munge
+    mode: 0700
+
+- name: let munge own run directory
+  file:
+    path: /usr/local/var/run/munge
+    state: directory
+    owner: munge
+    group: munge
+    mode: 0755
+
+- name: let munge group read etc directory
+  file:
+    path: /usr/local/etc/munge
+    state: directory
+    group: munge
+    mode: 0750
+
+- name: deploy munge key
+  copy:
+    content: "{{ munge.key }}"
+    dest: /usr/local/etc/munge/munge.key
+    owner: munge
+    group: munge
+    mode: 0400
+
+- name: start and enable munge
+  service:
+    name: munge
+    state: started
+    enabled: yes

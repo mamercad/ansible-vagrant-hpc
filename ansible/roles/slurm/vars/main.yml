@@ -1,0 +1,10 @@
+---
+
+slurm:
+  archive: http://www.schedmd.com/download/latest/slurm-16.05.5.tar.bz2
+  topdir: /usr/local/src
+  basedir: /usr/local/src/slurm-16.05.5
+  basename: slurm-16.05.5.tar.bz2
+  checksum: fa64de9846b3e82d7c49c1a6d3edfa50
+  uid: 5555
+  gid: 5555

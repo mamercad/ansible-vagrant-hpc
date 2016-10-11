@@ -1,0 +1,53 @@
+---
+
+- name: fetch slurm archive
+  get_url:
+    url: "{{ slurm.archive }}"
+    checksum: "md5:{{ slurm.checksum }}"
+    dest: "{{ slurm.topdir }}"
+    owner: root
+    group: root
+
+- name: extract slurm archive
+  unarchive:
+    src: "{{ slurm.topdir }}/{{ slurm.basename }}"
+    dest: "{{ slurm.topdir }}"
+    copy: no
+    owner: root
+    group: root
+
+- name: install Development Tools
+  yum:
+    name: "@Development Tools"
+    state: present
+
+- name: configure slurm
+  shell: ./configure
+  args:
+    chdir: "{{ slurm.basedir }}"
+    creates: config.log
+
+- name: make slurm
+  shell: make
+  args:
+    chdir: "{{ slurm.basedir }}"
+    creates: src/slurmd/slurmd/slurmd
+
+- name: make install slurm
+  shell: make install
+  args:
+    chdir: "{{ slurm.basedir }}"
+    creates: /usr/local/sbin/slurmd
+
+- name: create slurm group
+  group:
+    name: slurm
+    gid: "{{ slurm.gid }}"
+    state: present
+
+- name: create slurm user
+  user:
+    name: slurm
+    uid: "{{ slurm.uid }}"
+    group: slurm
+    state: present

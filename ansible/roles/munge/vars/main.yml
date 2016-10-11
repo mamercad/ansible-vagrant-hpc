@@ -1,0 +1,11 @@
+---
+
+munge:
+  archive: https://github.com/dun/munge/releases/download/munge-0.5.12/munge-0.5.12.tar.xz
+  topdir: /usr/local/src
+  basedir: /usr/local/src/munge-0.5.12
+  basename: munge-0.5.12.tar.xz
+  checksum: 088f5ee7f5f37011d90666b87db05de6a2b8bb7cec1b43167bc3459cb365a45ebdf09d583095fabdc1e547c3c96433ca9d71a79ff05b983e8623f8d429a6852b
+  key: supersecretchangeitnaturallyyesyesyesyesyes
+  uid: 4444
+  gid: 4444

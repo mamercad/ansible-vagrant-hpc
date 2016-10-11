@@ -1,0 +1,25 @@
+---
+
+- name: install ntp
+  yum:
+    name: ntp
+    state: present
+
+- name: start and enable ntpd
+  service:
+    name: ntpd
+    state: started
+    enabled: yes
+
+- name: create cluster group
+  group:
+    name: cluster
+    gid: "{{ cluster.gid }}"
+    state: present
+
+- name: create cluster user
+  user:
+    name: cluster
+    uid: "{{ cluster.uid }}"
+    group: cluster
+    state: present
